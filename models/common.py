@@ -75,13 +75,13 @@ class ADown(nn.Module):
         self.cv2 = Conv(c1 // 2, self.c, 1, 1, 0)
 
     def forward(self, x):
-        x = torch.nn.functional.avg_pool2d(x, 2, 1, 0, False, True)
+        x = torch.nn.functional.avg_pool2d(x, 2, 1, 0, False, True)##平均池化
         x1,x2 = x.chunk(2, 1)
         x1 = self.cv1(x1)
-        x2 = torch.nn.functional.max_pool2d(x2, 3, 2, 1)
+        x2 = torch.nn.functional.max_pool2d(x2, 3, 2, 1)##最大池化
         x2 = self.cv2(x2)
         return torch.cat((x1, x2), 1)
-
+##平均池化和最大池化实现下采样
 
 class RepConvN(nn.Module):
     """RepConv is a basic rep-style block, including training and deploy status
@@ -566,7 +566,7 @@ class SPPELAN(nn.Module):
         super().__init__()
         self.c = c3
         self.cv1 = Conv(c1, c3, 1, 1)
-        self.cv2 = SP(5)
+        self.cv2 = SP(5) ##SP为最大池化
         self.cv3 = SP(5)
         self.cv4 = SP(5)
         self.cv5 = Conv(4*c3, c2, 1, 1)

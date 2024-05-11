@@ -137,7 +137,7 @@ class DualDetect(nn.Module):
         self.nc = nc  # number of classes
         self.nl = len(ch) // 2  # number of detection layers
         self.reg_max = 16
-        self.no = nc + self.reg_max * 4  # number of outputs per anchor
+        self.no = nc + self.reg_max * 4  # number of outputs per anchor ##每个anchor的输出通道数
         self.inplace = inplace  # use inplace ops (e.g. slice assignment)
         self.stride = torch.zeros(self.nl)  # strides computed during build
 

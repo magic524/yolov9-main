@@ -12,11 +12,11 @@ anchors: 3
 
 # YOLOv9 backbone
 backbone:
-  [
-   [-1, 1, Silence, []],  
+  [                       ##[from,number,module,args]https://blog.csdn.net/weixin_43694096/article/details/124695537
+   [-1, 1, Silence, []],  ##第0层，第一个-1表示以上层输出作为本层输入,1表示模块重复次数
    
    # conv down
-   [-1, 1, Conv, [64, 3, 2]],  # 1-P1/2
+   [-1, 1, Conv, [64, 3, 2]],  # 1-P1/2 
 
    # conv down
    [-1, 1, Conv, [128, 3, 2]],  # 2-P2/4
@@ -81,7 +81,7 @@ head:
    # multi-level reversible auxiliary branch
    
    # routing
-   [5, 1, CBLinear, [[256]]], # 23
+   [5, 1, CBLinear, [[256]]], # 23 ##5表示从第5层的conv输出作为输入
    [7, 1, CBLinear, [[256, 512]]], # 24
    [9, 1, CBLinear, [[256, 512, 512]]], # 25
    

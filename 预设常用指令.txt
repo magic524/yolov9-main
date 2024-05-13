@@ -8,3 +8,10 @@ git status  ##查看版本库状态
 git add . <文件> ##将文件加入版本库
 git commit -m '<备注>' ##提交版本库
 git remote rename <旧名字> <新名字> ##改远程库名
+
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/magic524/-.git
+git push -u origin main

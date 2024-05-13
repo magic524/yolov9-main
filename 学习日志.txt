@@ -2,3 +2,10 @@
 问:git无法上传超过100M的文件，尝试使用lfs报错（无法连接远程库） 解：放弃使用lfs，精简减上传文件
 重新回顾yaml代码解析
 大概过了结构分析yolov9-c.yaml->common.py,yolo.py进行注释【有时间把每个分支结构画出结构图】
+
+240512
+看一半mamba论文+视频 plan：第二天看完
+尝试云gpu上使用git https://www.yisu.com/ask/29647467.html 解：直接在云上下载git初始化后可以用vscode源代码管理
+
+240513
+看一半mamba基础讲解 https://blog.csdn.net/zyw2002/article/details/136840829 plan：看完后看mamba代码解读与复现 https://blog.csdn.net/zyw2002/article/details/136927885

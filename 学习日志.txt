@@ -14,3 +14,6 @@ plan：看小怪兽yolo+transformer修改 https://blog.csdn.net/m0_63774211/arti
 云git：
     root@22b4e1434df3:~/git_c_root# git config --global user.email "1026060507@qq.com"
     root@22b4e1434df3:~/git_c_root# git config --global user.name "wuze"
+在蓝耘13960172178上配置mamba环境：https://blog.csdn.net/zyw2002/article/details/136927885
+配置mamba-ssm卡住，需要科学上网  解：https://blog.csdn.net/wayne6515/article/details/136423274 本地下载通过FileZIlla上传install 版本需要1.1.1，但解教程中1.0.1
+demo.py无法跑通，可能是ssm版本需要1.1.1，找到1.1.1

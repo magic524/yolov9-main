@@ -12,20 +12,20 @@ anchors: 3
 
 # YOLOv9 backbone
 backbone:
-  [
-   [-1, 1, Silence, []],  
+  [                       ##[from,number,module,args]https://blog.csdn.net/weixin_43694096/article/details/124695537
+   [-1, 1, Silence, []],  ##第0层，第一个-1表示以上层输出作为本层输入,1表示模块重复次数
    
    # conv down
-   [-1, 1, Conv, [64, 3, 2]],  # 1-P1/2
+   [-1, 1, Conv, [64, 3, 2]],  # 1-P1/2  ##conv from models.common.py,conv不是普通卷积，conv为conv2d+BatchNorm2d+？，区别v7并没有SiLu激活函数
 
    # conv down
    [-1, 1, Conv, [128, 3, 2]],  # 2-P2/4
 
    # elan-1 block
-   [-1, 1, RepNCSPELAN4, [256, 128, 64, 1]],  # 3
+   [-1, 1, RepNCSPELAN4, [256, 128, 64, 1]],  # 3 ##form common.py 580
 
    # avg-conv down
-   [-1, 1, ADown, [256]],  # 4-P3/8
+   [-1, 1, ADown, [256]],  # 4-P3/8 ##下采样 from common 70
 
    # elan-2 block
    [-1, 1, RepNCSPELAN4, [512, 256, 128, 1]],  # 5
@@ -47,7 +47,7 @@ backbone:
 head:
   [
    # elan-spp block
-   [-1, 1, SPPELAN, [512, 256]],  # 10
+   [-1, 1, SPPELAN, [512, 256]],  # 10  ##from common.py 563
 
    # up-concat merge
    [-1, 1, nn.Upsample, [None, 2, 'nearest']],
@@ -81,7 +81,7 @@ head:
    # multi-level reversible auxiliary branch
    
    # routing
-   [5, 1, CBLinear, [[256]]], # 23
+   [5, 1, CBLinear, [[256]]], # 23 ##5表示从第5层的conv输出作为输入
    [7, 1, CBLinear, [[256, 512]]], # 24
    [9, 1, CBLinear, [[256, 512, 512]]], # 25
    
@@ -119,6 +119,6 @@ head:
    
    # detection head
 
-   # detect
+   # detect ##接收31, 34, 37, 16, 19, 22层的输出 from models.yolo.py 190
    [[31, 34, 37, 16, 19, 22], 1, DualDDetect, [nc]],  # DualDDetect(A3, A4, A5, P3, P4, P5)
   ]

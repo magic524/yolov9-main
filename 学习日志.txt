@@ -4,8 +4,9 @@
 大概过了结构分析yolov9-c.yaml->common.py,yolo.py进行注释【有时间把每个分支结构画出结构图】
 
 240512
-看一半mamba论文+视频 plan：第二天看完
+精读mamba论文+视频 plan：第二天看完
 尝试云gpu上使用git https://www.yisu.com/ask/29647467.html 解：直接在云上下载git初始化后可以用vscode源代码管理
 
 240513
 看一半mamba基础讲解 https://blog.csdn.net/zyw2002/article/details/136840829 plan：看完后看mamba代码解读与复现 https://blog.csdn.net/zyw2002/article/details/136927885
+plan：看小怪兽yolo+transformer修改 https://blog.csdn.net/m0_63774211/article/details/136649609 或许可以借鉴

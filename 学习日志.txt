@@ -20,6 +20,9 @@ demo.py无法跑通，可能是ssm版本需要1.1.1，找到1.1.1,安装后解�
 
 240514
 开了gpu运行成功demo.py
-看了fer-yolo-mamba论文，环境配置未成，代码无法复现，而且代码没有输入bs和data的地方不会用
+看了fer-yolo-mamba论文+ppt，环境配置未成，代码无法复现，而且代码没有输入bs和data的地方不会用
 
+240515
+完成yolomamba的ppt
+创建云git，分开创建
 

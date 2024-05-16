@@ -4,6 +4,7 @@ import platform
 import sys
 from copy import deepcopy
 from pathlib import Path
+from models.block.HCFNetblocks import PPA
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[1]  # YOLO root directory
@@ -721,21 +722,23 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
     na = (len(anchors[0]) // 2) if isinstance(anchors, list) else anchors  # number of anchors
     no = na * (nc + 5)  # number of outputs = anchors * (classes + 5)
 
-    layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
+    layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out#################################################
     for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
         m = eval(m) if isinstance(m, str) else m  # eval strings
         for j, a in enumerate(args):
             with contextlib.suppress(NameError):
                 args[j] = eval(a) if isinstance(a, str) else a  # eval strings
-
+ 
         n = n_ = max(round(n * gd), 1) if n > 1 else n  # depth gain
         if m in {
             Conv, AConv, ConvTranspose, 
             Bottleneck, SPP, SPPF, DWConv, BottleneckCSP, nn.ConvTranspose2d, DWConvTranspose2d, SPPCSPC, ADown,
-            RepNCSPELAN4, SPPELAN}:
+            RepNCSPELAN4, SPPELAN,PPA
+ 
+            }:
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output
-                c2 = make_divisible(c2 * gw, 8)
+                c2 = make_divisible(c2 * gw, 8)########################################33
 
             args = [c1, c2, *args[1:]]
             if m in {BottleneckCSP, SPPCSPC}:

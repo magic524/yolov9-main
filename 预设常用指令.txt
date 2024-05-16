@@ -18,6 +18,7 @@ git commit -m "first commit"
 git branch -M main ##更改分支名
 git remote add origin https://github.com/magic524/-.git
 git push -u origin main
+git pull origin <分支名>
 
 conda创建虚拟环境
 conda create -n <环境名> python=<版本> ##创建环境

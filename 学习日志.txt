@@ -25,4 +25,12 @@ demo.py无法跑通，可能是ssm版本需要1.1.1，找到1.1.1,安装后解�
 240515
 完成yolomamba的ppt
 创建云git，分开创建
+尝试小怪兽https://blog.csdn.net/m0_63774211/article/details/138218375
+    创建block.DRANet.py
+    修改yolo.py 724~740
+    添加yaml
+    成功运行plan：尝试跑无人机数据集8bs 100epoch，后面跑夜间无人机
 
+240516
+对比DRANet与or没有明显提升，plan:尝试夜间数据集
+尝试小怪兽https://cv2023.blog.csdn.net/article/details/137593195

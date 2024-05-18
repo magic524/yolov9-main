@@ -2,6 +2,14 @@
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install pillow==9.5
 打开utils/loss_tal.py文件，到第167行，将p改为p[0]
+——————
+电脑配置
+nvidia -smi ##查看电脑驱动支持的最高cuda版本
+nvcc --version ##查看当前cuda版本
+https://developer.nvidia.com/cuda-downloads cuda下载，可以装在其他盘，安装除cuda外全部取消勾选，不安装cuda中Isight
+https://pytorch.org/get-started/previous-versions/ 安装cuda适配torch ##否则只进行cpu训练
+    conda install pytorch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 pytorch-cuda=12.1 -c pytorch -c nvidia
+
 
 git
 git init -b <分支名称> ##初始化创建分支

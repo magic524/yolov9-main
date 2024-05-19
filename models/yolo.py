@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
+from models.block.MSAM import MSAM
 from models.common import *
 from models.experimental import *
 from utils.general import LOGGER, check_version, check_yaml, make_divisible, print_args
@@ -753,9 +754,16 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             c2 = args[0]
             c1 = ch[f]
             args = [c1, c2, *args[1:]]
+        ###attention ####
+        elif m is MSAM:
+            c1, c2 = ch[f], args[0]
+            if c2 != nc:
+                c2 = make_divisible(c2 * gw, 8)
+            args = [c1, *args[1:]]
+        ###attention #####
         elif m is CBFuse:
             c2 = ch[f[-1]]
-        # TODO: channel, gw, gd
+        # TODO: channel, gw, gd 
         elif m in {Detect, DualDetect, TripleDetect, DDetect, DualDDetect, TripleDDetect, Segment, DSegment, DualDSegment, Panoptic}:
             args.append([ch[x] for x in f])
             # if isinstance(args[1], int):  # number of anchors

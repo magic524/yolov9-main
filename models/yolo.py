@@ -4,7 +4,7 @@ import platform
 import sys
 from copy import deepcopy
 from pathlib import Path
-from models.block.HCFNetblocks import PPA
+from models.block.HCANet import PPA
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[1]  # YOLO root directory

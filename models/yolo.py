@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
+from models.block.DRANet import RAB
 from models.block.MSAM import MSAM
 from models.common import *
 from models.experimental import *
@@ -733,7 +734,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         if m in {
             Conv, AConv, ConvTranspose, 
             Bottleneck, SPP, SPPF, DWConv, BottleneckCSP, nn.ConvTranspose2d, DWConvTranspose2d, SPPCSPC, ADown,
-            RepNCSPELAN4, SPPELAN}:
+            RepNCSPELAN4, SPPELAN,RAB}:
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output
                 c2 = make_divisible(c2 * gw, 8)

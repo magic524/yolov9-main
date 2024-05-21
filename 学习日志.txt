@@ -1,2 +1,48 @@
 240511
-git无法上传超过100M的文件，尝试使用lfs报错（无法连接远程库） 解：放弃使用lfs，精简减上传文件
+问:git无法上传超过100M的文件，尝试使用lfs报错（无法连接远程库） 解：放弃使用lfs，精简减上传文件
+重新回顾yaml代码解析
+大概过了结构分析yolov9-c.yaml->common.py,yolo.py进行注释【有时间把每个分支结构画出结构图】
+
+240512
+精读mamba论文+视频 plan：第二天看完
+尝试云gpu上使用git https://www.yisu.com/ask/29647467.html 解：直接在云上下载git初始化后可以用vscode源代码管理
+
+240513
+看一半mamba基础讲解 https://blog.csdn.net/zyw2002/article/details/136840829 plan：看完后看mamba代码解读与复现 https://blog.csdn.net/zyw2002/article/details/136927885
+plan：看小怪兽yolo+transformer修改 https://blog.csdn.net/m0_63774211/article/details/136649609 或许可以借鉴
+看完mamba论文，尝试从蓝耘上复现mamba
+云git：
+    root@22b4e1434df3:~/git_c_root# git config --global user.email "1026060507@qq.com"
+    root@22b4e1434df3:~/git_c_root# git config --global user.name "wuze"
+在蓝耘13960172178上配置mamba环境：https://blog.csdn.net/zyw2002/article/details/136927885
+配置mamba-ssm卡住，需要科学上网  解：https://blog.csdn.net/wayne6515/article/details/136423274 本地下载通过FileZIlla上传install 版本需要1.1.1，但解教程中1.0.1
+demo.py无法跑通，可能是ssm版本需要1.1.1，找到1.1.1,安装后解决，demo.py能跑但还没跑通，睡觉了,安装后解决，demo.py能跑但还没跑通，睡觉了，忘记开gpu了
+
+240514
+开了gpu运行成功demo.py
+看了fer-yolo-mamba论文+ppt，环境配置未成，代码无法复现，而且代码没有输入bs和data的地方不会用
+
+240515
+完成yolomamba的ppt
+创建云git，分开创建
+尝试小怪兽https://blog.csdn.net/m0_63774211/article/details/138218375
+    创建block.DRANet.py
+    修改yolo.py 724~740
+    添加yaml
+    成功运行plan：尝试跑无人机数据集8bs 100epoch，后面跑夜间无人机
+
+240516
+对比DRANet与or没有明显提升，plan:尝试夜间数据集
+尝试小怪兽https://cv2023.blog.csdn.net/article/details/137593195
+    
+240518
+重新安装本地环境，找到无法调用gpu的原因：需要在pytorch官网上复制安装指令连接cuda和torch
+
+
+240519
+尝试改RAB1,成功，未对比，感觉需要在夜间数据上训练对比
+尝试了几个yolo魔术师，除RAB1都失败
+
+240521
+找到mamba+yolov9：https://cv2023.blog.csdn.net/article/details/139067530 本地环境安装失败 安装mamba-ssm时遇到依赖冲突问题。重配置环境依然如此
+云上也跑不了mamba，各种版本不兼容问题

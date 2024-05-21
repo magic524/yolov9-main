@@ -1,0 +1,50 @@
+环境配置
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install pillow==9.5
+打开utils/loss_tal.py文件，到第167行，将p改为p[0]
+conda install pytorch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 pytorch-cuda=12.1 -c pytorch -c nvidia
+
+git
+git init -b <分支名称> ##初始化创建分支
+git status  ##查看版本库状态
+git add . <文件> ##将文件加入版本库
+git commit -m '<备注>' ##提交版本库
+git remote rename <旧名字> <新名字> ##改远程库名
+git branch <分支名> ##创建分支
+git checkout <已有的分支名> ##更改运行分支
+——————
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main ##更改分支名
+git remote add origin https://github.com/magic524/-.git
+git push -u origin main
+git pull origin <分支名>
+
+conda创建虚拟环境
+conda create -n <环境名> python=<版本> ##创建环境
+conda activate <环境名> ##激活环境
+
+——————
+1. 阿里云镜像：https://mirrors.aliyun.com/pypi/simple/
+2. 清华大学镜像：https://pypi.tuna.tsinghua.edu.cn/simple
+3. 豆瓣镜像：https://pypi.doubanio.com/simple/
+4. 中科大镜像：https://pypi.mirrors.ustc.edu.cn/simple/
+5. 华为云镜像：https://mirrors.huaweicloud.com/repository/pypi/simple/
+6. 腾讯云镜像：https://mirrors.cloud.tencent.com/pypi/simple/
+7. 网易镜像：http://mirrors.163.com/pypi/simple/
+8. 中国科学技术大学镜像：https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/
+9. 北京理工大学镜像：https://pypi.bfsu.edu.cn/simple/
+10. 西南大学镜像：https://pypi.swu.edu.cn/simple/
+11. 南京大学镜像：https://mirrors.nju.edu.cn/pypi/simple/
+12. 山东理工大学镜像：https://pypi.sdutlinux.org/simple/
+13. 中国科学院深圳先进技术研究院镜像：https://pypi.sztu.edu.cn/simple/
+14. 东北大学镜像：https://pypi.neu.edu.cn/simple/
+15. 西北大学镜像：https://mirrors.nwafu.edu.cn/pypi/web/simple/
+16. 北京师范大学镜像：https://pypi.bnu.edu.cn/simple/
+17. 华中科技大学镜像：https://pypi.hustunique.com/simple/
+18. 武汉理工大学镜像：https://pypi.whut.edu.cn/simple/
+19. 华南理工大学镜像：https://pypi.sysu.edu.cn/simple/
+20. 上海交通大学镜像：https://pypi.sjtug.sjtu.edu.cn/simple/
+————————————————
+

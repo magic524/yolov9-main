@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
 if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
+from models.block.mamba import C2f_VSS
 from models.common import *
 from models.experimental import *
 from utils.general import LOGGER, check_version, check_yaml, make_divisible, print_args
@@ -732,13 +733,13 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         if m in {
             Conv, AConv, ConvTranspose, 
             Bottleneck, SPP, SPPF, DWConv, BottleneckCSP, nn.ConvTranspose2d, DWConvTranspose2d, SPPCSPC, ADown,
-            RepNCSPELAN4, SPPELAN}:
+            RepNCSPELAN4, SPPELAN,C2f_VSS}:###
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output
                 c2 = make_divisible(c2 * gw, 8)
 
             args = [c1, c2, *args[1:]]
-            if m in {BottleneckCSP, SPPCSPC}:
+            if m in {BottleneckCSP, SPPCSPC,C2f_VSS}:###
                 args.insert(2, n)  # number of repeats
                 n = 1
         elif m is nn.BatchNorm2d:

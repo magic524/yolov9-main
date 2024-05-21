@@ -10,7 +10,7 @@ width_multiple: 1.0  # layer channel multiple
 # anchors
 anchors: 3
 
-# YOLOv9 backbone
+# YOLOv9 backbone ##[from,number,module,args]
 backbone:
   [
    [-1, 1, Silence, []],  

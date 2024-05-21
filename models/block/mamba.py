@@ -6,7 +6,6 @@ from functools import partial
 from typing import Optional, Callable
 from timm.layers import DropPath
  
-from mamba_ssm.ops.selective_scan_interface import selective_scan_fn, selective_scan_ref
  
 from models.common import Conv,Bottleneck
  

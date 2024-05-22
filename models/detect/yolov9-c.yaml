@@ -2,8 +2,8 @@
 
 # parameters
 nc: 80  # number of classes
-depth_multiple: 1.0  # model depth multiple
-width_multiple: 1.0  # layer channel multiple
+dpeth_multiple: 1.0  # model depth multiple ##深度，深度影响number，实际number为dpeth_multiple*number再与1做对比取最大值 ##yolo.pt 732
+width_multiple: 1.0  # layer channel multiple ##宽度，宽度控制通道数args[1],实际通道数为width_multiple*args[1]再与1做对比取最大值
 #activation: nn.LeakyReLU(0.1)
 #activation: nn.ReLU()
 
@@ -19,7 +19,7 @@ backbone:
    [-1, 1, Conv, [64, 3, 2]],  # 1-P1/2  ##conv from models.common.py,conv不是普通卷积，conv为conv2d+BatchNorm2d+？，区别v7并没有SiLu激活函数
 
    # conv down
-   [-1, 1, Conv, [128, 3, 2]],  # 2-P2/4
+   [-1, 1, Conv, [128, 3, 2]],  # 2-P2/4p
 
    # elan-1 block
    [-1, 1, RepNCSPELAN4, [256, 128, 64, 1]],  # 3 ##form common.py 580

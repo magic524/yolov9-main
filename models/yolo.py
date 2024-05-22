@@ -592,7 +592,7 @@ class DetectionModel(BaseModel):
 
         # Define model
         ch = self.yaml['ch'] = self.yaml.get('ch', ch)  # input channels
-        if nc and nc != self.yaml['nc']:
+        if nc and nc != self.yaml['nc']:   ###自动更新nc
             LOGGER.info(f"Overriding model.yaml nc={self.yaml['nc']} with nc={nc}")
             self.yaml['nc'] = nc  # override yaml value
         if anchors:
@@ -723,7 +723,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
     no = na * (nc + 5)  # number of outputs = anchors * (classes + 5)
 
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
-    for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
+    for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args ###遍历yaml结构
         m = eval(m) if isinstance(m, str) else m  # eval strings
         for j, a in enumerate(args):
             with contextlib.suppress(NameError):
@@ -735,7 +735,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             Bottleneck, SPP, SPPF, DWConv, BottleneckCSP, nn.ConvTranspose2d, DWConvTranspose2d, SPPCSPC, ADown,
             RepNCSPELAN4, SPPELAN}:###
             c1, c2 = ch[f], args[0]
-            if c2 != no:  # if not output
+            if c2 != no:  # if not output ##如果输出通道数不等于整个模型的通道数，输出c2整除8加速运算
                 c2 = make_divisible(c2 * gw, 8)
 
             args = [c1, c2, *args[1:]]

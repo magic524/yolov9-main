@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .conv import Conv, DWConv, GhostConv, LightConv, RepConv, autopad
+from .conv import Conv, Conv2, DWConv, GhostConv, LightConv, RepConv, autopad
 from .transformer import TransformerBlock
 
 __all__ = (
@@ -748,6 +748,29 @@ class CIB(nn.Module):
             Conv(2 * c_, 2 * c_, 3, g=2 * c_) if not lk else RepVGGDW(2 * c_),
             Conv(2 * c_, c2, 1),
             Conv(c2, c2, 3, g=c2),
+        )
+
+        self.add = shortcut and c1 == c2
+
+    def forward(self, x):
+        """'forward()' applies the YOLO FPN to input data."""
+        return x + self.cv1(x) if self.add else self.cv1(x)
+
+class CIB2(nn.Module): #############new###########
+    """Standard bottleneck."""
+
+    def __init__(self, c1, c2, shortcut=True, e=0.5, lk=False):
+        """Initializes a bottleneck module with given input/output channels, shortcut option, group, kernels, and
+        expansion.
+        """
+        super().__init__()
+        c_ = int(c2 * e)  # hidden channels
+        self.cv1 = nn.Sequential(
+            Conv(c1, c1, 3, g=c1),
+            Conv(c1, 2 * c_, 1),
+            Conv2(2 * c_, 2 * c_, 3, g=2 * c_),
+            Conv(2 * c_, c2, 1),
+            Conv2(c2, c2, 3, g=c2),
         )
 
         self.add = shortcut and c1 == c2

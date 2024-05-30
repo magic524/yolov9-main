@@ -756,6 +756,16 @@ class CIB(nn.Module):
         """'forward()' applies the YOLO FPN to input data."""
         return x + self.cv1(x) if self.add else self.cv1(x)
 
+class C2fCIB(C2f):
+    """Faster Implementation of CSP Bottleneck with 2 convolutions."""
+
+    def __init__(self, c1, c2, n=1, shortcut=False, lk=False, g=1, e=0.5):
+        """Initialize CSP bottleneck layer with two convolutions with arguments ch_in, ch_out, number, shortcut, groups,
+        expansion.
+        """
+        super().__init__(c1, c2, n, shortcut, g, e)
+        self.m = nn.ModuleList(CIB(self.c, self.c, shortcut, e=1.0, lk=lk) for _ in range(n))
+
 class CIB2(nn.Module): #############new###########
     """Standard bottleneck."""
 
@@ -779,7 +789,7 @@ class CIB2(nn.Module): #############new###########
         """'forward()' applies the YOLO FPN to input data."""
         return x + self.cv1(x) if self.add else self.cv1(x)
 
-class C2fCIB(C2f):
+class C2fCIB2(C2f):
     """Faster Implementation of CSP Bottleneck with 2 convolutions."""
 
     def __init__(self, c1, c2, n=1, shortcut=False, lk=False, g=1, e=0.5):
@@ -787,8 +797,9 @@ class C2fCIB(C2f):
         expansion.
         """
         super().__init__(c1, c2, n, shortcut, g, e)
-        self.m = nn.ModuleList(CIB(self.c, self.c, shortcut, e=1.0, lk=lk) for _ in range(n))
+        self.m = nn.ModuleList(CIB2(self.c, self.c, shortcut, e=1.0, lk=lk) for _ in range(n))
 
+###############################################################################
 
 class Attention(nn.Module):
     def __init__(self, dim, num_heads=8,

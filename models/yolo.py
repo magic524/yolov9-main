@@ -14,7 +14,7 @@ if platform.system() != 'Windows':
 
 ######from models.block.mamba import C2f_VSS########################
 from models.block.DualConv import DualConv
-from models.block.v10.block import CIB, CIB2, PSA, C2fCIB, C2fCIB2
+from models.block.v10.block import CIB, CIB2, C2fCIB, C2fCIB2
 from models.common import *
 from models.experimental import *
 from utils.general import LOGGER, check_version, check_yaml, make_divisible, print_args

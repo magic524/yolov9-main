@@ -4,6 +4,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from functools import partial
 
 from .conv import Conv, Conv2, DWConv, GhostConv, LightConv, RepConv, autopad
 from .transformer import TransformerBlock
@@ -766,7 +767,8 @@ class C2fCIB(C2f):
         super().__init__(c1, c2, n, shortcut, g, e)
         self.m = nn.ModuleList(CIB(self.c, self.c, shortcut, e=1.0, lk=lk) for _ in range(n))
 
-class CIB2(nn.Module): #############new###########
+#############new###########
+class CIB2(nn.Module): 
     """Standard bottleneck."""
 
     def __init__(self, c1, c2, shortcut=True, e=0.5, lk=False):
@@ -778,11 +780,11 @@ class CIB2(nn.Module): #############new###########
         self.cv1 = nn.Sequential(
             Conv(c1, c1, 3, g=c1),
             Conv(c1, 2 * c_, 1),
-            Conv2(2 * c_, 2 * c_, 3, g=2 * c_),
+            LightConv(2 * c_, 2 * c_, 3, g=2 * c_),
             Conv(2 * c_, c2, 1),
-            Conv2(c2, c2, 3, g=c2),
+            LightConv(c2, c2, 3, g=c2),
         )
-
+    
         self.add = shortcut and c1 == c2
 
     def forward(self, x):
@@ -798,7 +800,8 @@ class C2fCIB2(C2f):
         """
         super().__init__(c1, c2, n, shortcut, g, e)
         self.m = nn.ModuleList(CIB2(self.c, self.c, shortcut, e=1.0, lk=lk) for _ in range(n))
-
+##########################################################
+        
 ###############################################################################
 
 class Attention(nn.Module):

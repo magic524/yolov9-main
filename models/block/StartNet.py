@@ -43,7 +43,7 @@ class C2f(nn.Module):
  
  
 class ConvBN(torch.nn.Sequential):
-    def __init__(self, in_planes, out_planes, kernel_size=1, stride=1, padding=0, dilation=1, groups=1, with_bn=True):
+    def __init__(self, in_planes, out_planes, kernel_size=1, stride=1, g=1, padding=0, dilation=1, groups=1, with_bn=True):
         super().__init__()
         self.add_module('conv', torch.nn.Conv2d(in_planes, out_planes, kernel_size, stride, padding, dilation, groups))
         if with_bn:

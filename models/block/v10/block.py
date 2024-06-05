@@ -6,6 +6,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from functools import partial
 
+from models.block.MODSConv import MODSConv
+from models.block.StartNet import ConvBN
+
 from .conv import Conv, Conv2, DWConv, GhostConv, LightConv, RepConv, autopad
 from .transformer import TransformerBlock
 
@@ -813,9 +816,9 @@ class CIB2(nn.Module):
         self.cv1 = nn.Sequential(
             Conv(c1, c1, 3, g=c1),
             Conv(c1, 2 * c_, 1),
-            DWConv(2 * c_, 2 * c_, 3, g=2 * c_),
+            MODSConv(2 * c_, 2 * c_, 3, g=2 * c_),
             Conv(2 * c_, c2, 1),
-            DWConv(c2, c2, 3, g=c2),
+            MODSConv(c2, c2, 3, g=c2),
         )
     
         self.add = shortcut and c1 == c2

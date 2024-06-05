@@ -22,9 +22,9 @@ from utils.torch_utils import select_device, smart_inference_mode
 
 @smart_inference_mode()
 def run(
-        weights=ROOT / 'yolo.pt',  # model path or triton URL
-        source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
-        data=ROOT / 'data/coco.yaml',  # dataset.yaml path
+        weights=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\runs\\best.pt',  # model path or triton URL
+        source=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\images\\0000001_05999_d_0000011.jpg',  # file/dir/URL/glob/screen/0(webcam)
+        data=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\VisDrone.yaml',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold

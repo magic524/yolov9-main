@@ -783,9 +783,11 @@ class RepCIB(nn.Module):
         self.cv1 = nn.Sequential(
             Conv(c1, c1, 3, g=c1),
             Conv(c1, 2 * c_, 1),
-            RepConv(2 * c_, 2 * c_, 3, g=2 * c_),
+            RepConv(2 * c_, 2 * c_, 3, g=2 * c_) if not lk else RepVGGDW(2 * c_),
             Conv(2 * c_, c2, 1),
             RepConv(c2, c2, 3, g=c2),
+            nn.BatchNorm2d(c2),
+            nn.SiLU()
         )
     
         self.add = shortcut and c1 == c2

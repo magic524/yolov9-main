@@ -115,7 +115,7 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
         model.load_state_dict(csd, strict=False)  # load
         LOGGER.info(f'Transferred {len(csd)}/{len(model.state_dict())} items from {weights}')  # report
     else:
-        model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create ##输入的detect.yolo.yaml,ch为输入通道数，nc为检测类别（会自动更新）
+        model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
     amp = check_amp(model)  # check AMP
 
     # Freeze
@@ -443,8 +443,8 @@ def parse_opt(known=False):
     parser.add_argument('--cfg', type=str, default='D:\\pythondata\\gitYOLO\\yolov9-main\\models\\detect\\yolov9-c.yaml', help='model.yaml path')
     parser.add_argument('--data', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\VisDrone.yaml', help='dataset.yaml path')
     parser.add_argument('--hyp', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\hyps\\hyp.scratch-high.yaml', help='hyperparameters path')
-    parser.add_argument('--epochs', type=int, default=1, help='total training epochs')
-    parser.add_argument('--batch-size', type=int, default=2, help='total batch size for all GPUs, -1 for autobatch')
+    parser.add_argument('--epochs', type=int, default=2, help='total training epochs')
+    parser.add_argument('--batch-size', type=int, default=8, help='total batch size for all GPUs, -1 for autobatch')
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='train, val image size (pixels)')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
     parser.add_argument('--resume', nargs='?', const=True, default=False, help='resume most recent training')

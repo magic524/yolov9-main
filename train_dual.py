@@ -440,19 +440,11 @@ def parse_opt(known=False):
     # parser.add_argument('--weights', type=str, default=ROOT / 'yolo.pt', help='initial weights path')
     # parser.add_argument('--cfg', type=str, default='', help='model.yaml path')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
-<<<<<<< HEAD
-    parser.add_argument('--cfg', type=str, default='D:\\pythondata\\gitYOLO\\yolov9-main\\models\\detect\\yolov9-c-C2fCIB-ad\\yolov9-c-C2fRepCIB-DualConv.yaml', help='model.yaml path')
-    parser.add_argument('--data', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\african_wildlife.yaml', help='dataset.yaml path')
+    parser.add_argument('--cfg', type=str, default='D:\\pythondata\\gitYOLO\\yolov9-main\\models\\detect\\yolov9-c.yaml', help='model.yaml path')
+    parser.add_argument('--data', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\VisDrone.yaml', help='dataset.yaml path')
     parser.add_argument('--hyp', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\hyps\\hyp.scratch-high.yaml', help='hyperparameters path')
     parser.add_argument('--epochs', type=int, default=1, help='total training epochs')
     parser.add_argument('--batch-size', type=int, default=2, help='total batch size for all GPUs, -1 for autobatch')
-=======
-    parser.add_argument('--cfg', type=str, default='/root/yolov9/yolov9-main/models/detect/yolov9-c-C2fCIB-ad/yolov9-c-C2fRepCIB-DualConv.yaml', help='model.yaml path')
-    parser.add_argument('--data', type=str, default=ROOT / '/root/datasets/VisDrone/VisDrone.yaml', help='dataset.yaml path')
-    parser.add_argument('--hyp', type=str, default=ROOT / '/root/yolov9/yolov9-main/data/hyps/hyp.scratch-high.yaml', help='hyperparameters path')
-    parser.add_argument('--epochs', type=int, default=200, help='total training epochs')
-    parser.add_argument('--batch-size', type=int, default=4, help='total batch size for all GPUs, -1 for autobatch')
->>>>>>> 3819666d9c96b5adba8a1e29edacfff215c231ca
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='train, val image size (pixels)')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
     parser.add_argument('--resume', nargs='?', const=True, default=False, help='resume most recent training')

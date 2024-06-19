@@ -189,9 +189,9 @@ def run(
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolo.pt', help='model path or triton URL')
-    parser.add_argument('--source', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
-    parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'D:\\BaiduSyncdisk\\result\\v9-c-C2fRepCIB-DualConv-RepELEN5_vd200\\weights\\best.pt', help='model path or triton URL')
+    parser.add_argument('--source', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\images\\0000001_05999_d_0000011.jpg', help='file/dir/URL/glob/screen/0(webcam)')
+    parser.add_argument('--data', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\VisDrone.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')

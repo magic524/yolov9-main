@@ -598,6 +598,51 @@ class RepNCSPELAN4(nn.Module):
         return self.cv4(torch.cat(y, 1))
 
 #################
+# def fuse_conv_and_bn(conv, bn):
+#     # Fuse Conv and BatchNorm layers
+#     with torch.no_grad():
+#         fusedconv = nn.Conv2d(conv.in_channels, conv.out_channels,
+#                               kernel_size=conv.kernel_size, stride=conv.stride,
+#                               padding=conv.padding, bias=True)
+
+#         # Prepare filters
+#         w_conv = conv.weight.clone().view(conv.out_channels, -1)
+#         w_bn = torch.diag(bn.weight.div(torch.sqrt(bn.eps + bn.running_var)))
+#         fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.size()))
+
+#         # Prepare spatial bias
+#         b_conv = torch.zeros(conv.weight.size(0)) if conv.bias is None else conv.bias
+#         b_bn = bn.bias - bn.weight.mul(bn.running_mean).div(torch.sqrt(bn.running_var + bn.eps))
+#         fusedconv.bias.copy_(torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn)
+
+#     return fusedconv
+
+# class RepNCSPELAN5(nn.Module):
+#     def __init__(self, c1, c2, c3, c4, c5=1):  
+#         super().__init__()
+#         self.c = c3//2
+#         self.cv1 = Conv(c1, c3, 1, 1)
+#         self.cv2 = nn.Sequential(RepNCSP(c3//2, c4, c5), Conv(c4, c4, 3, 1))
+#         self.cv3 = nn.Sequential(RepNCSP(c4, c4, c5), Conv(c4, c4, 3, 1))
+#         self.cv4 = Conv(c3+(2*c4), c2, 1, 1)
+
+#     def forward(self, x):
+#         y = list(self.cv1(x).chunk(2, 1))
+#         y.extend((m(y[-1])) for m in [self.cv2, self.cv3])
+#         return self.cv4(torch.cat(y, 1))
+    
+#     def fuse(self):
+#         self.cv1 = fuse_conv_and_bn(self.cv1[0], self.cv1[1])
+#         self.cv2[1] = fuse_conv_and_bn(self.cv2[1][0], self.cv2[1][1])
+#         self.cv3[1] = fuse_conv_and_bn(self.cv3[1][0], self.cv3[1][1])
+#         self.cv4 = fuse_conv_and_bn(self.cv4[0], self.cv4[1])
+
+##################################################################################
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
 def fuse_conv_and_bn(conv, bn):
     # Fuse Conv and BatchNorm layers
     with torch.no_grad():
@@ -620,11 +665,11 @@ def fuse_conv_and_bn(conv, bn):
 class RepNCSPELAN5(nn.Module):
     def __init__(self, c1, c2, c3, c4, c5=1):  
         super().__init__()
-        self.c = c3//2
-        self.cv1 = Conv(c1, c3, 1, 1)
-        self.cv2 = nn.Sequential(RepNCSP(c3//2, c4, c5), Conv(c4, c4, 3, 1))
-        self.cv3 = nn.Sequential(RepNCSP(c4, c4, c5), Conv(c4, c4, 3, 1))
-        self.cv4 = Conv(c3+(2*c4), c2, 1, 1)
+        self.c = c3 // 2
+        self.cv1 = nn.Sequential(Conv(c1, c3, 1, 1), nn.BatchNorm2d(c3))
+        self.cv2 = nn.Sequential(RepNCSP(c3 // 2, c4, c5), Conv(c4, c4, 3, 1), nn.BatchNorm2d(c4))
+        self.cv3 = nn.Sequential(RepNCSP(c4, c4, c5), Conv(c4, c4, 3, 1), nn.BatchNorm2d(c4))
+        self.cv4 = nn.Sequential(Conv(c3 + (2 * c4), c2, 1, 1), nn.BatchNorm2d(c2))
 
     def forward(self, x):
         y = list(self.cv1(x).chunk(2, 1))
@@ -632,13 +677,16 @@ class RepNCSPELAN5(nn.Module):
         return self.cv4(torch.cat(y, 1))
     
     def fuse(self):
-        self.cv1 = fuse_conv_and_bn(self.cv1[0], self.cv1[1])
-        self.cv2[1] = fuse_conv_and_bn(self.cv2[1][0], self.cv2[1][1])
-        self.cv3[1] = fuse_conv_and_bn(self.cv3[1][0], self.cv3[1][1])
-        self.cv4 = fuse_conv_and_bn(self.cv4[0], self.cv4[1])
+        self.cv1[0] = fuse_conv_and_bn(self.cv1[0], self.cv1[1])
+        self.cv1 = self.cv1[0]
+        self.cv2[1] = fuse_conv_and_bn(self.cv2[1], self.cv2[2])
+        self.cv2 = nn.Sequential(self.cv2[0], self.cv2[1])
+        self.cv3[1] = fuse_conv_and_bn(self.cv3[1], self.cv3[2])
+        self.cv3 = nn.Sequential(self.cv3[0], self.cv3[1])
+        self.cv4[0] = fuse_conv_and_bn(self.cv4[0], self.cv4[1])
+        self.cv4 = self.cv4[0]
 
-##################################################################################
-
+############################################
 
 ##### YOLOR #####
 

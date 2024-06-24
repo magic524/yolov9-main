@@ -382,6 +382,64 @@ class RepNCSP(nn.Module):
 
     def forward(self, x):
         return self.cv3(torch.cat((self.m(self.cv1(x)), self.cv2(x)), 1))
+###########################################
+
+class RepNCSP2(nn.Module):
+    def __init__(self, c1, c2, n=1, shortcut=True, g=1, e=0.5):
+        super().__init__()
+        c_ = int(c2 * e)  # hidden channels
+        self.cv1 = Conv(c1, c_, 1, 1)
+        self.cv2 = Conv(c1, c_, 1, 1)
+        self.cv3 = Conv(2 * c_, c2, 1)  # optional act=FReLU(c2)
+        self.m = nn.Sequential(*(RepNBottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)))
+
+        # Initialize fused layers to None
+        self.fused_cv1 = None
+        self.fused_cv2 = None
+        self.fused_cv3 = None
+
+    def forward(self, x):
+        if self.fused_cv1 is not None:
+            return self.fused_forward(x)
+        
+        return self.cv3(torch.cat((self.m(self.cv1(x)), self.cv2(x)), 1))
+
+    def fused_forward(self, x):
+        y1 = self.fused_cv1(x)
+        y2 = self.fused_cv2(x)
+        y = torch.cat((self.m(y1), y2), 1)
+        return self.fused_cv3(y)
+
+    def fuse_convs(self):
+        self.fused_cv1 = self._fuse_conv_bn(self.cv1)
+        self.fused_cv2 = self._fuse_conv_bn(self.cv2)
+        self.fused_cv3 = self._fuse_conv_bn(self.cv3)
+
+    def _fuse_conv_bn(self, conv_block):
+        conv = conv_block.conv
+        bn = conv_block.bn
+
+        w = conv.weight.clone()
+        b = torch.zeros(conv.out_channels, device=w.device) if conv.bias is None else conv.bias.clone()
+
+        if bn is not None:
+            w_bn = bn.weight / torch.sqrt(bn.running_var + bn.eps)
+            w = w * w_bn.view(-1, 1, 1, 1)
+            b = bn.bias - bn.running_mean * w_bn if conv.bias is None else bn.bias + (conv.bias - bn.running_mean) * w_bn
+
+        fused_conv = nn.Conv2d(conv.in_channels, conv.out_channels, conv.kernel_size, conv.stride, conv.padding, conv.dilation, conv.groups, bias=True)
+        fused_conv.weight.data.copy_(w)
+        fused_conv.bias.data.copy_(b)
+
+        return fused_conv
+
+# Helper function to calculate padding
+def autopad(k, p=None, d=1):
+    if p is None:
+        p = (k - 1) // 2 * d if isinstance(k, int) else [(x - 1) // 2 * d for x in k]
+    return p
+
+###########################################
 
 
 class CSPBase(nn.Module):
@@ -598,116 +656,116 @@ class RepNCSPELAN4(nn.Module):
         return self.cv4(torch.cat(y, 1))
 
 #################
-# def fuse_conv_and_bn(conv, bn):
-#     # Fuse Conv and BatchNorm layers
-#     with torch.no_grad():
-#         fusedconv = nn.Conv2d(conv.in_channels, conv.out_channels,
-#                               kernel_size=conv.kernel_size, stride=conv.stride,
-#                               padding=conv.padding, bias=True)
+def fuse_conv_and_bn(conv, bn):
+    # Fuse Conv and BatchNorm layers
+    with torch.no_grad():
+        fusedconv = nn.Conv2d(conv.in_channels, conv.out_channels,
+                              kernel_size=conv.kernel_size, stride=conv.stride,
+                              padding=conv.padding, bias=True)
 
-#         # Prepare filters
-#         w_conv = conv.weight.clone().view(conv.out_channels, -1)
-#         w_bn = torch.diag(bn.weight.div(torch.sqrt(bn.eps + bn.running_var)))
-#         fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.size()))
+        # Prepare filters
+        w_conv = conv.weight.clone().view(conv.out_channels, -1)
+        w_bn = torch.diag(bn.weight.div(torch.sqrt(bn.eps + bn.running_var)))
+        fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.size()))
 
-#         # Prepare spatial bias
-#         b_conv = torch.zeros(conv.weight.size(0)) if conv.bias is None else conv.bias
-#         b_bn = bn.bias - bn.weight.mul(bn.running_mean).div(torch.sqrt(bn.running_var + bn.eps))
-#         fusedconv.bias.copy_(torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn)
+        # Prepare spatial bias
+        b_conv = torch.zeros(conv.weight.size(0)) if conv.bias is None else conv.bias
+        b_bn = bn.bias - bn.weight.mul(bn.running_mean).div(torch.sqrt(bn.running_var + bn.eps))
+        fusedconv.bias.copy_(torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn)
 
-#     return fusedconv
+    return fusedconv
 
-# class RepNCSPELAN5(nn.Module):
-#     def __init__(self, c1, c2, c3, c4, c5=1):  
-#         super().__init__()
-#         self.c = c3//2
-#         self.cv1 = Conv(c1, c3, 1, 1)
-#         self.cv2 = nn.Sequential(RepNCSP(c3//2, c4, c5), Conv(c4, c4, 3, 1))
-#         self.cv3 = nn.Sequential(RepNCSP(c4, c4, c5), Conv(c4, c4, 3, 1))
-#         self.cv4 = Conv(c3+(2*c4), c2, 1, 1)
-
-#     def forward(self, x):
-#         y = list(self.cv1(x).chunk(2, 1))
-#         y.extend((m(y[-1])) for m in [self.cv2, self.cv3])
-#         return self.cv4(torch.cat(y, 1))
-    
-#     def fuse(self):
-#         self.cv1 = fuse_conv_and_bn(self.cv1[0], self.cv1[1])
-#         self.cv2[1] = fuse_conv_and_bn(self.cv2[1][0], self.cv2[1][1])
-#         self.cv3[1] = fuse_conv_and_bn(self.cv3[1][0], self.cv3[1][1])
-#         self.cv4 = fuse_conv_and_bn(self.cv4[0], self.cv4[1])
-
-##################################################################################
-
-class RepNCSPELAN5(nn.Module):
-    def __init__(self, c1, c2, c3, c4, c5=1):
+class RepNCSPELAN6(nn.Module):
+    def __init__(self, c1, c2, c3, c4, c5=1):  
         super().__init__()
-        self.c = c3 // 2
+        self.c = c3//2
         self.cv1 = Conv(c1, c3, 1, 1)
-        self.cv2 = nn.Sequential(RepNCSP(c3 // 2, c4, c5), Conv(c4, c4, 3, 1))
-        self.cv3 = nn.Sequential(RepNCSP(c4, c4, c5), Conv(c4, c4, 3, 1))
-        self.cv4 = Conv(c3 + (2 * c4), c2, 1, 1)
-
-        # Initialize fused layers to None
-        self.fused_cv1 = None
-        self.fused_cv2 = None
-        self.fused_cv3 = None
-        self.fused_cv4 = None
+        self.cv2 = nn.Sequential(RepNCSP2(c3//2, c4, c5), Conv(c4, c4, 3, 1))
+        self.cv3 = nn.Sequential(RepNCSP2(c4, c4, c5), Conv(c4, c4, 3, 1))
+        self.cv4 = Conv(c3+(2*c4), c2, 1, 1)
 
     def forward(self, x):
-        if self.fused_cv1 is not None:
-            return self.fused_forward(x)
-        
         y = list(self.cv1(x).chunk(2, 1))
         y.extend((m(y[-1])) for m in [self.cv2, self.cv3])
         return self.cv4(torch.cat(y, 1))
+    
+    def fuse(self):
+        self.cv1 = fuse_conv_and_bn(self.cv1[0], self.cv1[1])
+        self.cv2[1] = fuse_conv_and_bn(self.cv2[1][0], self.cv2[1][1])
+        self.cv3[1] = fuse_conv_and_bn(self.cv3[1][0], self.cv3[1][1])
+        self.cv4 = fuse_conv_and_bn(self.cv4[0], self.cv4[1])
 
-    def forward_split(self, x):
-        if self.fused_cv1 is not None:
-            return self.fused_forward(x)
+##################################################################################
+
+# class RepNCSPELAN5(nn.Module):
+#     def __init__(self, c1, c2, c3, c4, c5=1):
+#         super().__init__()
+#         self.c = c3 // 2
+#         self.cv1 = Conv(c1, c3, 1, 1)
+#         self.cv2 = nn.Sequential(RepNCSP(c3 // 2, c4, c5), Conv(c4, c4, 3, 1))
+#         self.cv3 = nn.Sequential(RepNCSP(c4, c4, c5), Conv(c4, c4, 3, 1))
+#         self.cv4 = Conv(c3 + (2 * c4), c2, 1, 1)
+
+#         # Initialize fused layers to None
+#         self.fused_cv1 = None
+#         self.fused_cv2 = None
+#         self.fused_cv3 = None
+#         self.fused_cv4 = None
+
+#     def forward(self, x):
+#         if self.fused_cv1 is not None:
+#             return self.fused_forward(x)
         
-        y = list(self.cv1(x).split((self.c, self.c), 1))
-        y.extend(m(y[-1]) for m in [self.cv2, self.cv3])
-        return self.cv4(torch.cat(y, 1))
+#         y = list(self.cv1(x).chunk(2, 1))
+#         y.extend((m(y[-1])) for m in [self.cv2, self.cv3])
+#         return self.cv4(torch.cat(y, 1))
 
-    def fused_forward(self, x):
-        y1, y2 = self.fused_cv1(x).chunk(2, 1)
-        y2 = self.fused_cv2(y2)
-        y3 = self.fused_cv3(y2)
-        return self.fused_cv4(torch.cat([y1, y2, y3], 1))
+#     def forward_split(self, x):
+#         if self.fused_cv1 is not None:
+#             return self.fused_forward(x)
+        
+#         y = list(self.cv1(x).split((self.c, self.c), 1))
+#         y.extend(m(y[-1]) for m in [self.cv2, self.cv3])
+#         return self.cv4(torch.cat(y, 1))
 
-    def fuse_convs(self):
-        self.fused_cv1 = self._fuse_conv_bn(self.cv1)
-        self.fused_cv2 = self._fuse_sequential(self.cv2)
-        self.fused_cv3 = self._fuse_sequential(self.cv3)
-        self.fused_cv4 = self._fuse_conv_bn(self.cv4)
+#     def fused_forward(self, x):
+#         y1, y2 = self.fused_cv1(x).chunk(2, 1)
+#         y2 = self.fused_cv2(y2)
+#         y3 = self.fused_cv3(y2)
+#         return self.fused_cv4(torch.cat([y1, y2, y3], 1))
 
-    def _fuse_conv_bn(self, conv_block):
-        conv = conv_block.conv
-        bn = conv_block.bn
+#     def fuse_convs(self):
+#         self.fused_cv1 = self._fuse_conv_bn(self.cv1)
+#         self.fused_cv2 = self._fuse_sequential(self.cv2)
+#         self.fused_cv3 = self._fuse_sequential(self.cv3)
+#         self.fused_cv4 = self._fuse_conv_bn(self.cv4)
 
-        w = conv.weight.clone().view(conv.out_channels, -1)
-        b = torch.zeros(conv.out_channels, device=w.device) if conv.bias is None else conv.bias.clone()
+#     def _fuse_conv_bn(self, conv_block):
+#         conv = conv_block.conv
+#         bn = conv_block.bn
 
-        if bn is not None:
-            w_bn = bn.weight / (bn.running_var + bn.eps).sqrt()
-            w = (w * w_bn.view(-1, 1)).view_as(conv.weight)
-            b = bn.bias - bn.running_mean * w_bn if conv.bias is None else bn.bias + (conv.bias - bn.running_mean) * w_bn
+#         w = conv.weight.clone().view(conv.out_channels, -1)
+#         b = torch.zeros(conv.out_channels, device=w.device) if conv.bias is None else conv.bias.clone()
 
-        fused_conv = nn.Conv2d(conv.in_channels, conv.out_channels, conv.kernel_size, conv.stride, conv.padding, conv.dilation, conv.groups, bias=True)
-        fused_conv.weight.data.copy_(w)
-        fused_conv.bias.data.copy_(b)
+#         if bn is not None:
+#             w_bn = bn.weight / (bn.running_var + bn.eps).sqrt()
+#             w = (w * w_bn.view(-1, 1)).view_as(conv.weight)
+#             b = bn.bias - bn.running_mean * w_bn if conv.bias is None else bn.bias + (conv.bias - bn.running_mean) * w_bn
 
-        return fused_conv
+#         fused_conv = nn.Conv2d(conv.in_channels, conv.out_channels, conv.kernel_size, conv.stride, conv.padding, conv.dilation, conv.groups, bias=True)
+#         fused_conv.weight.data.copy_(w)
+#         fused_conv.bias.data.copy_(b)
 
-    def _fuse_sequential(self, sequential_block):
-        layers = []
-        for layer in sequential_block:
-            if isinstance(layer, Conv):
-                layers.append(self._fuse_conv_bn(layer))
-            else:
-                layers.append(layer)
-        return nn.Sequential(*layers)
+#         return fused_conv
+
+#     def _fuse_sequential(self, sequential_block):
+#         layers = []
+#         for layer in sequential_block:
+#             if isinstance(layer, Conv):
+#                 layers.append(self._fuse_conv_bn(layer))
+#             else:
+#                 layers.append(layer)
+#         return nn.Sequential(*layers)
 
 # Helper function to calculate padding
 def autopad(k, p=None, d=1):

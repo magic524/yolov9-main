@@ -715,7 +715,9 @@ def autopad(k, p=None, d=1):
         p = (k - 1) // 2 * d if isinstance(k, int) else [(x - 1) // 2 * d for x in k]
     return p
 
-##################################################################################
+
+############################################
+
 ##### YOLOR #####
 
 class ImplicitA(nn.Module):

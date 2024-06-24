@@ -768,10 +768,10 @@ class RepNCSPELAN6(nn.Module):
 #         return nn.Sequential(*layers)
 
 # Helper function to calculate padding
-def autopad(k, p=None, d=1):
-    if p is None:
-        p = (k - 1) // 2 * d if isinstance(k, int) else [(x - 1) // 2 * d for x in k]
-    return p
+# def autopad(k, p=None, d=1):
+#     if p is None:
+#         p = (k - 1) // 2 * d if isinstance(k, int) else [(x - 1) // 2 * d for x in k]
+#     return p
 
 
 ############################################

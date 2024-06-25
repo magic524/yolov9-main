@@ -440,7 +440,7 @@ def parse_opt(known=False):
     # parser.add_argument('--weights', type=str, default=ROOT / 'yolo.pt', help='initial weights path')
     # parser.add_argument('--cfg', type=str, default='', help='model.yaml path')
     parser.add_argument('--weights', type=str, default='', help='initial weights path')
-    parser.add_argument('--cfg', type=str, default='D:\\pythondata\\gitYOLO\\yolov9-main\\models\\detect\\yolov9-c-C2fCIB-ad\\v9c-2C2fRepCIB-DC-RepELEN6.yaml', help='model.yaml path')
+    parser.add_argument('--cfg', type=str, default='D:\\pythondata\\gitYOLO\yolov9-main\\models\\detect\\yolov9-c-C2fCIB-ad\\v9c-2C2fRepCIB-DC2.yaml', help='model.yaml path')
     parser.add_argument('--data', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\african_wildlife.yaml', help='dataset.yaml path')
     parser.add_argument('--hyp', type=str, default=ROOT / 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\hyps\\hyp.scratch-high.yaml', help='hyperparameters path')
     parser.add_argument('--epochs', type=int, default=1, help='total training epochs')

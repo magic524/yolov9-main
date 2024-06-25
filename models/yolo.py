@@ -13,7 +13,7 @@ if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 ######from models.block.mamba import C2f_VSS########################
-from models.block.DualConv import DualConv
+from models.block.DualConv import DualConv, DualConv2
 from models.block.v10.block import CIB, CIB2, C2fCIB, C2fCIB2, C2fRepCIB
 from models.common import *
 from models.experimental import *
@@ -735,7 +735,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         if m in {
             Conv, AConv, ConvTranspose, 
             Bottleneck, SPP, SPPF, DWConv, BottleneckCSP, nn.ConvTranspose2d, DWConvTranspose2d, SPPCSPC, ADown,
-            RepNCSPELAN4, SPPELAN,C2fCIB,DualConv,CIB,CIB2,C2fCIB2,C2fRepCIB,RepNCSPELAN6}: ###
+            RepNCSPELAN4, SPPELAN,C2fCIB,DualConv,CIB,CIB2,C2fCIB2,C2fRepCIB,RepNCSPELAN6,DualConv2}: ###
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output ##如果输出通道数不等于整个模型的通道数，输出c2整除8加速运算
                 c2 = make_divisible(c2 * gw, 8)

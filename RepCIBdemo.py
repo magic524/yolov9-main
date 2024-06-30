@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
 import matplotlib.pyplot as plt
+import os
 
 # Define Conv and RepConv classes (simplified versions)
 class Conv(nn.Module):
@@ -30,9 +31,7 @@ class RepCIB(nn.Module):
     """Standard bottleneck."""
 
     def __init__(self, c1, c2, shortcut=True, e=0.5, lk=False):
-        """Initializes a bottleneck module with given input/output channels, shortcut option, group, kernels, and
-        expansion.
-        """
+        """Initializes a bottleneck module with given input/output channels, shortcut option, group, kernels, and expansion."""
         super().__init__()
         c_ = int(c2 * e)  # hidden channels
         self.cv1 = nn.Sequential(
@@ -53,25 +52,31 @@ class RepCIB(nn.Module):
 # Load and preprocess an example image
 def load_image(image_path):
     image = Image.open(image_path).convert('RGB')
+    original_size = image.size
     transform = transforms.Compose([
-        transforms.Resize((256, 256)),
         transforms.ToTensor(),
     ])
     image = transform(image).unsqueeze(0)  # Add batch dimension
-    return image
+    return image, original_size
 
-def visualize_feature_maps(feature_maps, title):
-    num_maps = feature_maps.size(1)
-    fig, axes = plt.subplots(1, min(num_maps, 8), figsize=(15, 15))  # Show up to 8 feature maps
-    for i in range(min(num_maps, 8)):
-        axes[i].imshow(feature_maps[0, i].detach().cpu().numpy(), cmap='viridis')
-        axes[i].axis('off')
-    plt.suptitle(title)
-    plt.show()
+def save_feature_maps(feature_maps, layer_name, save_dir, input_size, max_maps=3):
+    num_maps = min(feature_maps.size(1), max_maps)
+    os.makedirs(save_dir, exist_ok=True)
+    
+    for i in range(num_maps):
+        plt.figure(figsize=(input_size[0] / 100, input_size[1] / 100))
+        feature_map_resized = transforms.functional.resize(
+            transforms.ToPILImage()(feature_maps[0, i].detach().cpu()), (input_size[1], input_size[0])
+        )
+        plt.imshow(feature_map_resized, cmap='viridis')
+        plt.axis('off')
+        save_path = os.path.join(save_dir, f"{layer_name}_feature_map_{i+1}.png")
+        plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+        plt.close()
 
 # Example usage
-image_path = 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\images\\0000001_05999_d_0000011.jpg'  # Replace with your image path
-image = load_image(image_path)
+image_path = 'D:\\pythondata\\gitYOLO\\yolov9-main\\data\\images\\9999951_00000_d_0000020.jpg'  # Replace with your image path
+image, original_size = load_image(image_path)
 
 # Define the model
 model = RepCIB(c1=3, c2=64, shortcut=True, e=0.5, lk=False)
@@ -90,9 +95,13 @@ for layer in model.cv1:
 # Forward pass
 output = model(image)
 
-# Visualize all collected feature maps
-for i, (layer, feature_maps) in enumerate(layer_outputs):
-    visualize_feature_maps(feature_maps, f'Layer {i+1}: {layer.__class__.__name__}')
+# Directory to save feature maps
+save_dir = 'D:\\pythondata\\gitYOLO\\yolov9-main\\runs\\RepCIBdemo\\4'
 
-# Visualize final output
-visualize_feature_maps(output, 'Final Output')
+# Save all collected feature maps
+for i, (layer, feature_maps) in enumerate(layer_outputs):
+    layer_name = f'Layer_{i+1}_{layer.__class__.__name__}'
+    save_feature_maps(feature_maps, layer_name, save_dir, original_size)
+
+# Save final output feature maps
+save_feature_maps(output, 'Final_Output', save_dir, original_size)
